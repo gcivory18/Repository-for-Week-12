@@ -1,0 +1,170 @@
+// class for watch brand that includes name parameter and watches array
+class WatchBrand {
+  constructor(name) {
+    this.name = name;
+    this.watches = [];
+  }
+
+  addWatch(watchname, watchface, material) {
+    this.watches.push(new Watch(watchname, watchface, material));
+  }
+}
+// class for watch that includes the parameters watchname, watchface and material
+class Watch {
+  constructor(watchname, watchface, material, id) {
+    this.watchname = watchname;
+    this.watchface = watchface;
+    this.material = material;
+    this.id = id;
+  }
+}
+// Added my API link followed by CRUD operations
+class WatchService {
+  static url = "https://63c0a7b899c0a15d28d9a205.mockapi.io/watches";
+
+  static getAllWatchBrands() {
+    return $.get(this.url);
+  }
+
+  static getWatchBrand(id) {
+    return $.get(`${this.url}/${id}`);
+  }
+
+  static createWatchBrand(watchbrand) {
+    return $.post(this.url, watchbrand);
+  }
+
+  static updateWatchBrand(watchbrand) {
+    console.log("update watchbrand", watchbrand);
+    return $.ajax({
+      url: `${this.url}/${watchbrand.id}`,
+      dataType: "json",
+      data: JSON.stringify(watchbrand),
+      contentType: "application/json",
+      type: "PUT",
+    });
+  }
+
+  static deleteWatchBrand(id) {
+    return $.ajax({
+      url: `${this.url}/${id}`,
+      type: "DELETE",
+    });
+  }
+}
+
+class DOMManager {
+  static watchbrands;
+
+  static getAllWatchBrands() {
+    WatchService.getAllWatchBrands().then((watchbrands) =>
+      this.render(watchbrands)
+    );
+  }
+
+  static createWatchBrand(name) {
+    WatchService.createWatchBrand(new WatchBrand(name))
+      .then(() => WatchService.getAllWatchBrands())
+      .then((watchbrands) => this.render(watchbrands));
+  }
+
+  static deleteWatchBrand(id) {
+    WatchService.deleteWatchBrand(id).then(() =>
+      WatchService.getAllWatchBrands().then((watches) => this.render(watches))
+    );
+  }
+
+  static addWatch(id) {
+    console.log("Testing my watch id", id);
+    for (let watchbrand of this.watchbrands) {
+      if (watchbrand.id == id) {
+        // let watchId = 123;
+        // look into a method to give watches a way to have a unique ID. push that ID to line 88
+        // methods such as filter, includes. for loop iterates through watches array watchbrand.watches
+        // if an ID already exists iterate to the next available ID i++ until this ID does not exist and we will exit the loop and push watchId to API
+        watchbrand.watches.push(
+          new Watch(
+            $(`#${watchbrand.id}-watch-watchname`).val(),
+            $(`#${watchbrand.id}-watch-watchface`).val(),
+            $(`#${watchbrand.id}-watch-material`).val()
+            // watchId,
+          )
+        );
+        WatchService.updateWatchBrand(watchbrand)
+          .then(() => WatchService.getAllWatchBrands())
+          .then((watchbrands) => this.render(watchbrands));
+      }
+    }
+  }
+
+  static deleteWatch(watchBrandId, watchId) {
+    console.log("testing delete:", watchBrandId, watchId);
+    for (let watchbrand of this.watchbrands) {
+      if (watchbrand.id == watchBrandId) {
+        for (let watch of watchbrand.watches) {
+          if (watch.id == watchId) {
+            watchbrand.watches.splice(watchbrand.watches.indexOf(watch, 1));
+            WatchService.updateWatchBrand(watchbrand)
+              .then(() => WatchService.getAllWatchBrands())
+              .then((watchbrands) => this.render(watchbrands));
+          }
+        }
+      }
+    }
+  }
+
+  static render(watchbrands) {
+    this.watchbrands = watchbrands;
+    // this.watchbrands.reverse()
+    $("#app").empty();
+    for (let watchbrand of watchbrands) {
+      console.log(watchbrand);
+      $("#app").prepend(`
+                <div id="${watchbrand.id}" class="card">
+                    <div class="card-header">
+                        <h2>${watchbrand.name}</h2>
+                        <button class="btn btn-danger" onclick="DOMManager.deleteWatchBrand('${watchbrand.id}')">Delete</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="card">
+                            <div class="row">
+                                <div class="col-sm">
+                                    <input type="text" id="${watchbrand.id}-watch-watchname" class="form-control" placeholder="Watch Name">
+                            </div>
+                            <div class="col-sm">
+                                <input type="text" id="${watchbrand.id}-watch-watchface" class="form-control" placeholder="Watch Face">
+                            </div>
+                            <div class="col-sm">
+                                <input type="text" id="${watchbrand.id}-watch-material" class="form-control" placeholder="Watch Material">
+                                </div>
+                            </div>
+                            <button id="${watchbrand.id}-new-watch" onclick="DOMManager.addWatch('${watchbrand.id}')" class="btn btn-primary form-control">Add Watch</button>
+                        </div>
+                    </div>
+                </div> <br>`);
+
+      for (let watch of watchbrand.watches) {
+        $(`#${watchbrand.id}`)
+          .find(".card-body")
+          .append(
+            `<p>
+                    <span id="name-${watch.id}"><strong>Watchname: </strong> ${watch.watchname}</span>
+                    <span id="name-${watch.id}"><strong>Watchface: </strong> ${watch.watchface}</span>
+                    <span id="name-${watch.id}"><strong>Mateiral: </strong> ${watch.material}</span>
+                    <button class="btn btn-danger" = onclick="DOMManager.deleteWatch('${watchbrand.id}', '${watch.id}')">Delete Watch</button>
+                    </p>
+                    `
+          );
+      }
+    }
+  }
+}
+
+// create new watch brand
+$("#create-new-watchbrand").click(() => {
+  DOMManager.createWatchBrand($("#new-watchbrand-name").val());
+  $("#new-watchbrand-name").val("");
+});
+
+// get all watches on first render
+DOMManager.getAllWatchBrands();
