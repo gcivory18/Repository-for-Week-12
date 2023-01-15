@@ -52,7 +52,7 @@ class WatchService {
     });
   }
 }
-
+// Document Object Model AKA DOM Class 
 class DOMManager {
   static watchbrands;
 
@@ -78,7 +78,8 @@ class DOMManager {
     console.log("Testing my watch id", id);
     for (let watchbrand of this.watchbrands) {
       if (watchbrand.id == id) {
-        // let watchId = watchbrand.watches.filter(function(value)) {
+        // let watchId = watchbrand.watches.filter(function(watchbrand.id)) => 
+        // watchbrand.id.watchname === i.length > 0
 
         // }
         //declares a variable to filter through each watch and if an existing id is in place it will increment by 1 until an available id is found.
