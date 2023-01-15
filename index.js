@@ -78,10 +78,10 @@ class DOMManager {
     console.log("Testing my watch id", id);
     for (let watchbrand of this.watchbrands) {
       if (watchbrand.id == id) {
-        // let watchId = 123;
-        // look into a method to give watches a way to have a unique ID. push that ID to line 88
-        // methods such as filter, includes. for loop iterates through watches array watchbrand.watches
-        // if an ID already exists iterate to the next available ID i++ until this ID does not exist and we will exit the loop and push watchId to API
+        // let watchId = watchbrand.watches.filter(function(value)) {
+
+        // }
+        //declares a variable to filter through each watch and if an existing id is in place it will increment by 1 until an available id is found.
         watchbrand.watches.push(
           new Watch(
             $(`#${watchbrand.id}-watch-watchname`).val(),
@@ -96,7 +96,7 @@ class DOMManager {
       }
     }
   }
-
+  // deleteWatch method to delete watches within the watch brands that incudes watch name, face, material
   static deleteWatch(watchBrandId, watchId) {
     console.log("testing delete:", watchBrandId, watchId);
     for (let watchbrand of this.watchbrands) {
@@ -112,7 +112,8 @@ class DOMManager {
       }
     }
   }
-
+  // render method that incoudes HTML to create the body of the cards after a brand is added and the additonal info of
+  // watch name, watch face and material
   static render(watchbrands) {
     this.watchbrands = watchbrands;
     // this.watchbrands.reverse()
@@ -123,7 +124,7 @@ class DOMManager {
                 <div id="${watchbrand.id}" class="card">
                     <div class="card-header">
                         <h2>${watchbrand.name}</h2>
-                        <button class="btn btn-danger" onclick="DOMManager.deleteWatchBrand('${watchbrand.id}')">Delete</button>
+                        <button class="btn btn-danger" onclick="DOMManager.deleteWatchBrand('${watchbrand.id}')">Delete Watch Brand</button>
                     </div>
                     <div class="card-body">
                         <div class="card">
@@ -150,7 +151,7 @@ class DOMManager {
             `<p>
                     <span id="name-${watch.id}"><strong>Watchname: </strong> ${watch.watchname}</span>
                     <span id="name-${watch.id}"><strong>Watchface: </strong> ${watch.watchface}</span>
-                    <span id="name-${watch.id}"><strong>Mateiral: </strong> ${watch.material}</span>
+                    <span id="name-${watch.id}"><strong>Material: </strong> ${watch.material}</span>
                     <button class="btn btn-danger" = onclick="DOMManager.deleteWatch('${watchbrand.id}', '${watch.id}')">Delete Watch</button>
                     </p>
                     `
